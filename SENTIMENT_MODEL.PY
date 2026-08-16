@@ -1,22 +1,41 @@
-# Simple Sentiment Classifier
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
 
-# Text input to analyze
-sample_text = "I love learning artificial intelligence!"
+# 1. Training Dataset (Text + Labels)
+data = {
+    "text": [
+        "I love this product, it works amazingly well!",
+        "Fantastic experience, highly recommend to everyone.",
+        "Terrible quality, broke on the very first day.",
+        "Worst purchase ever. Absolutely useless and waste of money.",
+        "Decent value for the price, satisfied overall.",
+        "Horrible customer service and slow delivery."
+    ],
+    "sentiment": ["positive", "positive", "negative", "negative", "positive", "negative"]
+}
 
-# Key word lists
-positive_words = ["love", "great", "awesome", "fantastic", "good"]
-negative_words = ["hate", "bad", "terrible", "awful", "worst"]
+df = pd.DataFrame(data)
 
-#process text
-words = sample_text.lower().split()
+# 2. Create Machine Learning Pipeline (TF-IDF Vectorizer + Logistic Regression)
+model_pipeline = Pipeline([
+    ('tfidf', TfidfVectorizer()),
+    ('classifier', LogisticRegression())
+])
 
-#  Predict sentiment
-if any(word in positive_words for word in words):
-    print(f"Text: '{sample_text}'")
-    print("Result: Positive Sentiment")
-elif any(word in negative_words for word in words):
-    print(f"Text: '{sample_text}'")
-    print("Result: Negative Sentiment")
-else:
-    print(f"Text: '{sample_text}'")
-    print("Result: Neutral Sentiment")
+# 3. Train the Model
+model_pipeline.fit(df['text'], df['sentiment'])
+
+# 4. Test Model on New, Unseen Text
+new_sentences = [
+    "The item arrived fast and works great!",
+    "Extremely disappointed with the cheap material."
+]
+
+predictions = model_pipeline.predict(new_sentences)
+
+# 5. Output Results
+print("--- Machine Learning Sentiment Classifier Results ---")
+for text, label in zip(new_sentences, predictions):
+    print(f"Text: '{text}' --> Predicted Sentiment: {label.upper()}")
