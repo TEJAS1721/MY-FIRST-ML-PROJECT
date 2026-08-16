@@ -1,49 +1,35 @@
-import pandas as pd
 import streamlit as st
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 # Page Configuration
-st.set_page_config(page_title="Sentiment Classifier", page_icon="🤖")
-st.title("🤖 Live AI Sentiment Classifier")
-st.write("Type any review or statement below to test the trained machine learning model in real time.")
+st.set_page_config(page_title="AI Sentiment Classifier", page_icon="🤖")
+st.title("🤖 Production AI Sentiment Classifier")
+st.write("Analyze **any** sentence using a pre-trained Natural Language Processing model.")
 
-# Train Model (Cached to run only once)
+# Download pre-trained lexicon once
 @st.cache_resource
-def train_sentiment_model():
-    data = {
-        "text": [
-            "I love this product, it works amazingly well!",
-            "Fantastic experience, highly recommend to everyone.",
-            "Great quality and super fast delivery.",
-            "Terrible quality, broke on the very first day.",
-            "Worst purchase ever. Absolutely useless waste of money.",
-            "Horrible customer service, very disappointed."
-        ],
-        "sentiment": ["Positive", "Positive", "Positive", "Negative", "Negative", "Negative"]
-    }
-    df = pd.DataFrame(data)
-    
-    pipeline = Pipeline([
-        ('tfidf', TfidfVectorizer()),
-        ('classifier', LogisticRegression())
-    ])
-    pipeline.fit(df['text'], df['sentiment'])
-    return pipeline
+def load_sentiment_analyzer():
+    nltk.download('vader_lexicon')
+    return SentimentIntensityAnalyzer()
 
-model = train_sentiment_model()
+sia = load_sentiment_analyzer()
 
-# User Input Field
-user_input = st.text_input("Enter text to analyze:", value="This product is fantastic!")
+# User Input
+user_input = st.text_input("Enter text to analyze:", value="This app works surprisingly well!")
 
-# Prediction Action
 if st.button("Predict Sentiment"):
     if user_input.strip():
-        prediction = model.predict([user_input])[0]
-        if prediction == "Positive":
-            st.success(f"**Predicted Sentiment:** {prediction} 😄")
+        # Get sentiment scores
+        scores = sia.polarity_scores(user_input)
+        compound = scores['compound']
+        
+        # Display Results
+        if compound >= 0.05:
+            st.success(f"**Predicted Sentiment:** Positive 😄 (Confidence Score: {compound:.2f})")
+        elif compound <= -0.05:
+            st.error(f"**Predicted Sentiment:** Negative 😞 (Confidence Score: {compound:.2f})")
         else:
-            st.error(f"**Predicted Sentiment:** {prediction} 😞")
+            st.info(f"**Predicted Sentiment:** Neutral 😐 (Confidence Score: {compound:.2f})")
     else:
         st.warning("Please enter some text before analyzing.")
