@@ -20,7 +20,7 @@ A beginner-friendly Natural Language Processing (NLP) pipeline written in Python
 An interactive Natural Language Processing (NLP) web application built with Python, NLTK, and Streamlit that predicts text sentiment in real time.
 
 ## 🚀 Live App
-[Click here to test the live app](https://my-first-ml-project-qfbnepfblbhuk8fxnqfqms.streamlit.app)
+[Click here to test the live app](https://my-first-ml-project-dhydncqjqysbpk3bsh5qxi.streamlit.app/)
 
 ## 💡 What I Built & Key Learnings
 - **Pre-trained NLP Lexicon:** Upgraded from a baseline prototype to NLTK's VADER model (9,000+ words) to handle Out-of-Vocabulary (OOV) words, negations, and context.
